@@ -743,6 +743,7 @@ html.intro-lock,html.intro-lock body{overflow:hidden!important}
 .film-foot{right:calc(var(--pad) + 74px)}
 @media (max-width:760px){.film-foot{right:calc(var(--pad) + 52px)}}
 /* V33: scroll dock — up / down arrows, bottom-right */
+@media (min-width:901px){#hero .shape-switch:not(:where(.x)),#hero .scroll-cue{right:calc(var(--pad) + 82px)}}
 .sdock{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));z-index:58;display:flex;flex-direction:column;align-items:center;gap:8px;padding:7px;border-radius:999px;
   background:rgba(14,12,22,.72);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);box-shadow:0 10px 30px rgba(0,0,0,.45);
   opacity:0;transform:translateY(16px) scale(.9);pointer-events:none;transition:opacity .5s,transform .5s cubic-bezier(.2,.9,.25,1.2)}
@@ -768,7 +769,7 @@ html.intro-lock,html.intro-lock body{overflow:hidden!important}
 @media (prefers-reduced-motion:reduce){.sdock button::before{animation:none}.sdock button:hover .c1,.sdock button:hover .c2{animation:none}}
 </style>
 </head>
-<body data-mood="electric">
+<body data-mood="sunset">
 <div id="intro" role="dialog" aria-label="Intro: Nitin Chandra Brand Engine" aria-live="off">
   <video id="introVid" muted playsinline preload="auto" aria-hidden="true"></video>
   <div class="in-grid" aria-hidden="true"></div>
@@ -947,8 +948,8 @@ html.intro-lock,html.intro-lock body{overflow:hidden!important}
   </nav>
   <div class="nav-right">
     <div class="moods" role="group" aria-label="Colour mood">
-      <button class="mood" data-mood="electric" style="--sw:conic-gradient(#FF2E88,#7C5CFF,#00E0FF,#C8FF00,#FF2E88)" aria-label="Electric mood" aria-pressed="true"></button>
-      <button class="mood" data-mood="sunset" style="--sw:conic-gradient(#FF5A36,#FF2E88,#FFB627,#B07CFF,#FF5A36)" aria-label="Sunset mood" aria-pressed="false"></button>
+      <button class="mood" data-mood="electric" style="--sw:conic-gradient(#FF2E88,#7C5CFF,#00E0FF,#C8FF00,#FF2E88)" aria-label="Electric mood" aria-pressed="false"></button>
+      <button class="mood" data-mood="sunset" style="--sw:conic-gradient(#FF5A36,#FF2E88,#FFB627,#B07CFF,#FF5A36)" aria-label="Sunset mood" aria-pressed="true"></button>
       <button class="mood" data-mood="acid" style="--sw:conic-gradient(#C8FF00,#00F5A0,#00D1FF,#FF2E88,#C8FF00)" aria-label="Acid mood" aria-pressed="false"></button>
       <button class="mood" data-mood="ocean" style="--sw:conic-gradient(#00D1FF,#5B7CFF,#A78BFA,#00F5A0,#00D1FF)" aria-label="Ocean mood" aria-pressed="false"></button>
     </div>
@@ -970,8 +971,8 @@ html.intro-lock,html.intro-lock body{overflow:hidden!important}
   <a href="#brief">Brief me</a>
   <a href="#contact">Contact</a>
   <div class="moods" role="group" aria-label="Colour mood">
-    <button class="mood" data-mood="electric" style="--sw:conic-gradient(#FF2E88,#7C5CFF,#00E0FF,#C8FF00,#FF2E88)" aria-label="Electric mood" aria-pressed="true"></button>
-    <button class="mood" data-mood="sunset" style="--sw:conic-gradient(#FF5A36,#FF2E88,#FFB627,#B07CFF,#FF5A36)" aria-label="Sunset mood" aria-pressed="false"></button>
+    <button class="mood" data-mood="electric" style="--sw:conic-gradient(#FF2E88,#7C5CFF,#00E0FF,#C8FF00,#FF2E88)" aria-label="Electric mood" aria-pressed="false"></button>
+    <button class="mood" data-mood="sunset" style="--sw:conic-gradient(#FF5A36,#FF2E88,#FFB627,#B07CFF,#FF5A36)" aria-label="Sunset mood" aria-pressed="true"></button>
     <button class="mood" data-mood="acid" style="--sw:conic-gradient(#C8FF00,#00F5A0,#00D1FF,#FF2E88,#C8FF00)" aria-label="Acid mood" aria-pressed="false"></button>
     <button class="mood" data-mood="ocean" style="--sw:conic-gradient(#00D1FF,#5B7CFF,#A78BFA,#00F5A0,#00D1FF)" aria-label="Ocean mood" aria-pressed="false"></button>
   </div>
@@ -1424,7 +1425,7 @@ const ICON = {
 /* ---------- mood (colour theme) ---------- */
 let hero3d = null;
 function setMood(m) {
-  if (!PALETTES[m]) m = 'electric';
+  if (!PALETTES[m]) m = 'sunset';
   document.body.dataset.mood = m;
   $$('.mood').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mood === m)));
   if (hero3d) hero3d.setPalette(PALETTES[m]);
