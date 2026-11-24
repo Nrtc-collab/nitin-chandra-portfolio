@@ -739,6 +739,33 @@ html.intro-lock,html.intro-lock body{overflow:hidden!important}
 }
 @media (prefers-reduced-motion:reduce){.cap-step,.cap-arrow::after,.vis-auto .flow,.vis-web .blk,.vis-film .strip,.vis-3d .cube,.vis-badge::before,.vis-film .rec::before{animation:none!important}}
 @media (max-width:760px){*,*::before,*::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}.nav.scrolled{background:rgba(7,6,11,.94)}}
+
+.film-foot{right:calc(var(--pad) + 74px)}
+@media (max-width:760px){.film-foot{right:calc(var(--pad) + 52px)}}
+/* V33: scroll dock — up / down arrows, bottom-right */
+.sdock{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));z-index:58;display:flex;flex-direction:column;align-items:center;gap:8px;padding:7px;border-radius:999px;
+  background:rgba(14,12,22,.72);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);box-shadow:0 10px 30px rgba(0,0,0,.45);
+  opacity:0;transform:translateY(16px) scale(.9);pointer-events:none;transition:opacity .5s,transform .5s cubic-bezier(.2,.9,.25,1.2)}
+.sdock.on{opacity:1;transform:none;pointer-events:auto}
+.sdock button{position:relative;width:46px;height:46px;border-radius:50%;border:0;padding:0;cursor:pointer;color:var(--text);background:#141120;display:grid;place-items:center;isolation:isolate;transition:transform .25s,opacity .35s,filter .35s}
+.sdock button::before{content:"";position:absolute;inset:-2px;border-radius:50%;z-index:-1;background:conic-gradient(from var(--ang,0deg),var(--a1),var(--a2),var(--a3),var(--a4),var(--a1));animation:sdspin 5s linear infinite;opacity:.9}
+.sdock button::after{content:"";position:absolute;inset:1.5px;border-radius:50%;z-index:-1;background:#141120}
+@property --ang{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes sdspin{to{--ang:360deg}}
+.sdock button svg{width:20px;height:20px;overflow:visible}
+.sdock button .c2{opacity:.35;transition:transform .3s,opacity .3s}
+.sdock button:hover{transform:scale(1.08)}
+.sdock .sd-up:hover .c1{animation:sdbobU .8s ease-in-out infinite}.sdock .sd-up:hover .c2{opacity:.8;animation:sdbobU .8s .12s ease-in-out infinite}
+.sdock .sd-down:hover .c1{animation:sdbobD .8s ease-in-out infinite}.sdock .sd-down:hover .c2{opacity:.8;animation:sdbobD .8s .12s ease-in-out infinite}
+@keyframes sdbobU{50%{transform:translateY(-3px)}}@keyframes sdbobD{50%{transform:translateY(3px)}}
+.sdock button:active{transform:scale(.92)}
+.sdock button:focus-visible{outline:2px solid var(--a4);outline-offset:3px}
+.sdock button[disabled]{opacity:.28;filter:grayscale(1);cursor:default;transform:none}
+.sdock button[disabled]::before{animation:none}
+.sd-track{width:3px;height:34px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}
+.sd-track i{display:block;width:100%;height:100%;transform-origin:50% 0;transform:scaleY(0);background:linear-gradient(var(--a1),var(--a2),var(--a3));border-radius:3px}
+@media (max-width:760px){.sdock{gap:6px;padding:5px;right:max(12px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));background:rgba(14,12,22,.9)}.sdock button{width:40px;height:40px}.sd-track{height:24px}}
+@media (prefers-reduced-motion:reduce){.sdock button::before{animation:none}.sdock button:hover .c1,.sdock button:hover .c2{animation:none}}
 </style>
 </head>
 <body data-mood="electric">
@@ -1338,6 +1365,13 @@ html.intro-lock,html.intro-lock body{overflow:hidden!important}
   <span>Designed &amp; developed by <strong style="color:var(--text);font-weight:600">NITIN CHANDRA</strong></span>
   <a href="#hero">Back to top ↑</a>
 </footer>
+
+<nav class="sdock" id="sdock" aria-label="Page scroll">
+  <button class="sd-up" id="sdUp" type="button" aria-label="Scroll up" title="Up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="c1" d="M6 11l6-6 6 6"/><path class="c2" d="M6 18l6-6 6 6"/></svg></button>
+  <span class="sd-track" aria-hidden="true"><i id="sdFill"></i></span>
+  <button class="sd-down" id="sdDown" type="button" aria-label="Scroll down" title="Down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="c1" d="M6 13l6 6 6-6"/><path class="c2" d="M6 6l6 6 6-6"/></svg></button>
+</nav>
+
 
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Video player">
   <button class="btn lb-close" id="lbClose" aria-label="Close video">
@@ -3091,6 +3125,37 @@ function codeFilm() {
     }
   }), { threshold: 0.3 });
   ring && io.observe(ring); tc && io.observe(tc);
+})();
+</script>
+
+<script>
+/* V33: scroll dock — jumps to the next / previous section; long sections move one screen at a time */
+(function scrollDock() {
+  const dock = document.getElementById('sdock'), up = document.getElementById('sdUp'), down = document.getElementById('sdDown'), fill = document.getElementById('sdFill');
+  if (!dock) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const marks = () => [...document.querySelectorAll('#main > section:not([hidden]), .footer')].map(el => Math.round(el.getBoundingClientRect().top + scrollY)).sort((a, b) => a - b);
+  const maxY = () => document.documentElement.scrollHeight - innerHeight;
+  function go(dir) {
+    const y = scrollY, step = Math.round(innerHeight * .85), m = marks(); let t;
+    if (dir > 0) { const n = m.find(v => v > y + 8); t = (n !== undefined && n - y <= innerHeight * 1.05) ? n : y + step; }
+    else { const p = m.filter(v => v < y - 8).pop(); t = (p !== undefined && y - p <= innerHeight * 1.05) ? p : y - step; }
+    scrollTo({ top: Math.max(0, Math.min(maxY(), t)), behavior: reduce ? 'auto' : 'smooth' });
+  }
+  up.addEventListener('click', () => go(-1));
+  down.addEventListener('click', () => go(1));
+  let raf = 0;
+  function upd() {
+    raf = 0;
+    const y = scrollY, mx = Math.max(1, maxY());
+    fill.style.transform = 'scaleY(' + Math.min(1, y / mx).toFixed(3) + ')';
+    up.disabled = y < 8; down.disabled = y > mx - 8;
+    dock.classList.toggle('on', !document.getElementById('intro') && !document.body.classList.contains('menu-open'));
+  }
+  const req = () => { if (!raf) raf = requestAnimationFrame(upd); };
+  addEventListener('scroll', req, { passive: true }); addEventListener('resize', req);
+  setInterval(req, 700);
+  upd();
 })();
 </script>
 </body>
