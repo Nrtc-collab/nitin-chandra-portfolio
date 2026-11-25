@@ -149,6 +149,12 @@ body.loaded .hero-title .line:nth-child(2) .line-in{animation-delay:.12s}
   .shape-switch{left:var(--pad);right:auto;bottom:62px}
   .scroll-cue{display:none}
 }
+@media (max-width:760px){
+  #hero{padding-top:max(300px,40svh)}
+  .hero-title{font-size:min(13vw,64px);margin:20px 0 16px}
+  .hero-title .line:nth-child(2){-webkit-text-stroke-width:1.6px}
+  .hero-inner{text-shadow:0 2px 18px rgba(7,6,11,.95)}
+}
 
 /* ---------- tape marquee ---------- */
 .tape{position:relative;height:clamp(150px,18vw,220px);overflow:hidden;display:grid;place-items:center;margin:-10px 0}
@@ -772,7 +778,7 @@ html.intro-lock,html.intro-lock body{overflow:hidden!important}
 .sdock button[disabled]::before{animation:none}
 .sd-track{width:3px;height:34px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}
 .sd-track i{display:block;width:100%;height:100%;transform-origin:50% 0;transform:scaleY(0);background:linear-gradient(var(--a1),var(--a2),var(--a3));border-radius:3px}
-@media (max-width:760px){.sdock{gap:6px;padding:5px;right:max(12px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));background:rgba(14,12,22,.9)}.sdock button{width:40px;height:40px}.sd-track{height:24px}}
+@media (max-width:760px){.sdock{gap:6px;padding:5px;right:max(12px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));background:rgba(14,12,22,.9)}.sdock button{width:36px;height:36px}.sdock button svg{width:17px;height:17px}.sdock{gap:4px;padding:4px;background:rgba(14,12,22,.72)}.sd-track{height:14px}}
 @media (prefers-reduced-motion:reduce){.sdock button::before{animation:none}.sdock button:hover .c1,.sdock button:hover .c2{animation:none}}
 </style>
 </head>
@@ -2229,11 +2235,29 @@ function initHero3D() {
     camera.updateProjectionMatrix();
     offsetX = w > 900 ? 2.35 : 0;
     baseY = w > 900 ? 0 : 2.0;
-    floaters.forEach(f => { f.visible = w > 900 || f.userData.base[1] > 0; });
+    floaters.forEach(f => { f.visible = w > 900 || f.userData.base[1] > 0; f.userData.mob = null; f.scale.setScalar(1); });
     group.scale.setScalar(w > 900 ? 1 : 0.9);
+    // V40: on phones the helix sits in its own band between the header and the text, never behind the words
+    const inner = heroEl.querySelector('.hero-inner');
+    if (w <= 760 && inner) {
+      const upp = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) / h;   // world units per css px
+      const top = 84, bottom = inner.offsetTop - 6, room = Math.max(140, bottom - top);
+      const sc = Math.min(0.9, room * upp / 4.4);
+      const cy = top + room / 2;
+      group.scale.setScalar(sc);
+      baseY = (h / 2 - cy) * upp;
+      const half = Math.min(w * upp / 2 - 0.42, 1.5);
+      floaters.forEach((f, i) => {
+        f.visible = i === 0 || i === 3;
+        if (f.visible) f.userData.mob = i === 0 ? [-half, baseY + room * upp * 0.22, -1] : [half, baseY - room * upp * 0.24, -1];
+        f.scale.setScalar(f.visible ? 0.62 : 1);
+      });
+    }
   }
   addEventListener('resize', resize);
   resize();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(resize);
+  setTimeout(resize, 1600);
 
   /* ---- loop ---- */
   // one loop only (tab switches / scrolling no longer stack extra loops), and time-based so the speed
@@ -2278,7 +2302,7 @@ function initHero3D() {
     }
     geo.attributes.position.needsUpdate = true;
     floaters.forEach(f => {
-      const b = f.userData.base;
+      const b = f.userData.mob || f.userData.base;
       f.rotation.x += 0.004 * dt; f.rotation.y += 0.006 * dt;
       f.position.x = b[0] + smooth.x * 0.4 * (1 + b[2] * -0.2);
       f.position.y = b[1] + Math.sin(t + f.userData.ph) * 0.18 + smooth.y * 0.3;
@@ -3158,7 +3182,10 @@ function codeFilm() {
     const y = scrollY, mx = Math.max(1, maxY());
     fill.style.transform = 'scaleY(' + Math.min(1, y / mx).toFixed(3) + ')';
     up.disabled = y < 8; down.disabled = y > mx - 8;
-    dock.classList.toggle('on', !document.getElementById('intro') && !document.body.classList.contains('menu-open'));
+    // V40: on phones the dock waits until the hero is scrolled past, so it never sits on the intro text
+    const hero = document.getElementById('hero'), phone = innerWidth <= 760;
+    const past = !phone || !hero || y > hero.offsetHeight * 0.55;
+    dock.classList.toggle('on', past && !document.getElementById('intro') && !document.body.classList.contains('menu-open'));
   }
   const req = () => { if (!raf) raf = requestAnimationFrame(upd); };
   addEventListener('scroll', req, { passive: true }); addEventListener('resize', req);
