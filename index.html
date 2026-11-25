@@ -12,7 +12,10 @@
 <meta name="description" content="Nitin Chandra — Brand & Content Strategist. Ad films, Google & Meta Ads, SaaS & automation, web design.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" as="script" crossorigin>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"></noscript>
 <style>
 [hidden]{display:none!important}
 :root{
@@ -1382,8 +1385,7 @@ html.intro-lock,html.intro-lock body{overflow:hidden!important}
   <video id="lbVideo" controls playsinline></video>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
+<script type="text/nc-later">
 /* =====================================================================
    Site content. Films and reels appear only when a real file is set.
    Film:  { title: 'Film name', brand: 'Brand', ratio: '16:9' or '9:16', src: 'videos/film.mp4' }
@@ -1475,7 +1477,7 @@ fillTrack($('#track2'), tapeWords2);
 function tapeSpeed() {                                // same calm pace on both tapes, however long they are
   $$('.track').forEach(t => { const half = t.scrollWidth / 2; if (half > 0) t.style.animationDuration = (half / 62).toFixed(1) + 's'; });
 }
-tapeSpeed(); addEventListener('load', tapeSpeed); addEventListener('resize', tapeSpeed);
+tapeSpeed(); addEventListener('load', tapeSpeed); addEventListener('resize', tapeSpeed); if (document.fonts && document.fonts.ready) document.fonts.ready.then(tapeSpeed);
 let tapeCache = null;
 const tapeAnims = () => tapeCache && tapeCache.length ? tapeCache : (tapeCache = $$('.track').flatMap(t => t.getAnimations ? t.getAnimations() : []));
 
@@ -2956,7 +2958,7 @@ function codeFilm() {
 })();
 
 </script>
-<script>
+<script type="text/nc-later">
 /* ---------- V20: steel turntable — a seamless loop that never stops; hovering only highlights ---------- */
 (function () {
   const stage = document.getElementById('ttStage'); if (!stage || typeof SERVICES === 'undefined') return;
@@ -3086,7 +3088,7 @@ function codeFilm() {
   document.addEventListener('visibilitychange', () => { if (document.hidden) vid.pause(); else { keepPlaying(); kick(); } });
 })();
 </script>
-<script>
+<script type="text/nc-later">
 /* ---------- V23: capabilities — cards stack as you scroll; small live visuals ---------- */
 (function () {
   const stack = document.getElementById('capStack'); if (!stack) return;
@@ -3130,7 +3132,7 @@ function codeFilm() {
 })();
 </script>
 
-<script>
+<script type="text/nc-later">
 /* V33: scroll dock — jumps to the next / previous section; long sections move one screen at a time */
 (function scrollDock() {
   const dock = document.getElementById('sdock'), up = document.getElementById('sdUp'), down = document.getElementById('sdDown'), fill = document.getElementById('sdFill');
@@ -3158,6 +3160,20 @@ function codeFilm() {
   addEventListener('scroll', req, { passive: true }); addEventListener('resize', req);
   setInterval(req, 700);
   upd();
+})();
+</script>
+<script>
+/* V36: page paints first; the 3D library loads in the background, then the site scripts run in order */
+(function () {
+  var done = false;
+  function run() {
+    if (done) return; done = true;
+    var list = document.querySelectorAll('script[type="text/nc-later"]');
+    for (var i = 0; i < list.length; i++) { var o = list[i], n = document.createElement('script'); n.text = o.text; o.parentNode.replaceChild(n, o); }
+  }
+  var t = document.createElement('script'); t.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'; t.crossOrigin = 'anonymous'; t.onload = run; t.onerror = run;
+  document.head.appendChild(t);
+  setTimeout(run, 12000);
 })();
 </script>
 </body>
