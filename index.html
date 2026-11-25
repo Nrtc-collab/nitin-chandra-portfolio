@@ -2245,9 +2245,23 @@ function initHero3D() {
     baseY = w > 900 ? 0 : 2.0;
     floaters.forEach(f => { f.visible = w > 900 || f.userData.base[1] > 0; });
     group.scale.setScalar(w > 900 ? 1 : 0.9);
+    floaters.forEach(f => { f.userData.mob = null; });
+    // V42: on phones the helix follows the name, so it sits behind the title instead of high above it
+    const title = heroEl.querySelector('.hero-title');
+    if (w <= 760 && title) {
+      const upp = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) / h;
+      const tr = title.getBoundingClientRect(), hr = heroEl.getBoundingClientRect();
+      const cy = (tr.top + tr.bottom) / 2 - hr.top - 20;
+      if (tr.height > 0) {
+        baseY = (h / 2 - cy) * upp;
+        floaters.forEach(f => { const b = f.userData.base; f.userData.mob = [b[0], b[1] + baseY - 2.0, b[2]]; });
+      }
+    }
   }
   addEventListener('resize', resize);
   resize();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(resize);
+  setTimeout(resize, 1600);
 
   /* ---- loop ---- */
   // one loop only (tab switches / scrolling no longer stack extra loops), and time-based so the speed
@@ -2292,7 +2306,7 @@ function initHero3D() {
     }
     geo.attributes.position.needsUpdate = true;
     floaters.forEach(f => {
-      const b = f.userData.base;
+      const b = f.userData.mob || f.userData.base;
       f.rotation.x += 0.004 * dt; f.rotation.y += 0.006 * dt;
       f.position.x = b[0] + smooth.x * 0.4 * (1 + b[2] * -0.2);
       f.position.y = b[1] + Math.sin(t + f.userData.ph) * 0.18 + smooth.y * 0.3;
