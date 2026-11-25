@@ -161,6 +161,13 @@ body.loaded .hero-title .line:nth-child(2) .line-in{animation-delay:.12s}
   .hero-ctas .btn{flex:1 1 0;min-width:0;justify-content:center;gap:8px;padding:12px 10px;font-size:14px}
 }
 @media (max-width:350px){.hero-ctas .btn{font-size:13px;gap:6px;padding:12px 8px}.hero-ctas .btn svg{width:15px;height:15px}}
+@media (max-width:760px){
+  /* V43: text block sits higher, the shape switch follows right under the buttons */
+  #hero{flex-direction:column;justify-content:center;align-items:flex-start;padding-top:96px;padding-bottom:30px}
+  #hero .hero-inner{width:100%}
+  #hero .shape-switch{position:relative;left:auto;right:auto;bottom:auto;margin-top:22px}
+  #hero .hero-hint{position:relative;left:auto;bottom:auto;margin:10px 0 0}
+}
 
 /* ---------- tape marquee ---------- */
 .tape{position:relative;height:clamp(150px,18vw,220px);overflow:hidden;display:grid;place-items:center;margin:-10px 0}
