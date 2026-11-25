@@ -162,8 +162,8 @@ body.loaded .hero-title .line:nth-child(2) .line-in{animation-delay:.12s}
 }
 @media (max-width:350px){.hero-ctas .btn{font-size:13px;gap:6px;padding:12px 8px}.hero-ctas .btn svg{width:15px;height:15px}}
 @media (max-width:760px){
-  /* V43: text block sits higher, the shape switch follows right under the buttons */
-  #hero{flex-direction:column;justify-content:center;align-items:flex-start;padding-top:96px;padding-bottom:30px}
+  /* V44: text block starts right under the header, the shape switch follows right under the buttons */
+  #hero{flex-direction:column;justify-content:flex-start;align-items:flex-start;padding-top:84px;padding-bottom:30px}
   #hero .hero-inner{width:100%}
   #hero .shape-switch{position:relative;left:auto;right:auto;bottom:auto;margin-top:22px}
   #hero .hero-hint{position:relative;left:auto;bottom:auto;margin:10px 0 0}
@@ -2241,7 +2241,7 @@ function initHero3D() {
   });
 
   /* ---- layout ---- */
-  let offsetX = 0, baseY = 0;
+  let offsetX = 0, baseY = 0, heroFade = 1;
   function resize() {
     const w = heroEl.clientWidth, h = heroEl.clientHeight;
     renderer.setSize(w, h, false);
@@ -2253,13 +2253,15 @@ function initHero3D() {
     floaters.forEach(f => { f.visible = w > 900 || f.userData.base[1] > 0; });
     group.scale.setScalar(w > 900 ? 1 : 0.9);
     floaters.forEach(f => { f.userData.mob = null; });
-    // V42: on phones the helix follows the name, so it sits behind the title instead of high above it
-    const title = heroEl.querySelector('.hero-title');
-    if (w <= 760 && title) {
+    // V44: on phones the helix is centred behind the hero text block and never pokes out above the banner
+    const block = heroEl.querySelector('.hero-inner');
+    heroFade = w <= 760 ? 0.5 : 1;
+    if (w <= 760 && block) {
       const upp = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) / h;
-      const tr = title.getBoundingClientRect(), hr = heroEl.getBoundingClientRect();
-      const cy = (tr.top + tr.bottom) / 2 - hr.top - 20;
+      const tr = block.getBoundingClientRect(), hr = heroEl.getBoundingClientRect();
+      const cy = (tr.top + tr.bottom) / 2 - hr.top;
       if (tr.height > 0) {
+        group.scale.setScalar(Math.min(0.9, tr.height * 0.86 * upp / 4.4));
         baseY = (h / 2 - cy) * upp;
         floaters.forEach(f => { const b = f.userData.base; f.userData.mob = [b[0], b[1] + baseY - 2.0, b[2]]; });
       }
@@ -2291,7 +2293,7 @@ function initHero3D() {
     const sy = scrollY;
     group.position.x = offsetX;
     group.position.y = baseY + sy * 0.0022;
-    canvas.style.opacity = String(1 - clamp(sy / heroEl.clientHeight, 0, 1) * 0.85);
+    canvas.style.opacity = String((1 - clamp(sy / heroEl.clientHeight, 0, 1) * 0.85) * heroFade);
     group.updateMatrixWorld();
     if (mode === 'dna') FX.update(dt);
     const p = pointerIn && mode !== 'play' ? localHit() : null;
