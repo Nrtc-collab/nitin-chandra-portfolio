@@ -808,9 +808,9 @@ html.intro-lock,html.intro-lock body{overflow:hidden!important}
   var count = document.getElementById('inCount'), bar = document.getElementById('inBar'), tc = document.getElementById('inTc');
   var title = document.getElementById('inTitle'), hud = document.getElementById('inHud'), ring = document.getElementById('inRing');
   var small = innerWidth < 760;
-  vid.src = small ? 'assets/intro-v5-nitin-chandra-engine-480.mp4' : 'assets/intro-v5-nitin-chandra-engine-1080.mp4';
-  vid.poster = 'assets/intro-v5-nitin-chandra-engine-poster.jpg';
-  if (small) vid.addEventListener('error', function () { if (vid.src.indexOf('-480.mp4') > -1) { vid.src = 'assets/intro-v5-nitin-chandra-engine-720.mp4'; var q = vid.play(); if (q && q.catch) q.catch(function () {}); } });
+  vid.src = small ? 'assets/intro-v5-nitin-chandra-engine-720-lite.mp4' : 'assets/intro-v5-nitin-chandra-engine-1080.mp4';
+  vid.poster = small ? 'assets/intro-v5-nitin-chandra-engine-poster-mobile.webp' : 'assets/intro-v5-nitin-chandra-engine-poster.jpg';
+  if (small) vid.addEventListener('error', function () { if (vid.src.indexOf('-720-lite.mp4') > -1) { vid.src = 'assets/intro-v5-nitin-chandra-engine-720.mp4'; var q = vid.play(); if (q && q.catch) q.catch(function () {}); } });
 
   // the agents: one named cursor per part, like the helper sessions in a launch film
   var AG = [
